@@ -1,0 +1,4 @@
+/build
+/inst
+/src/doc/
+*.root
