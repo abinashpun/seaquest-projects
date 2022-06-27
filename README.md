@@ -1,4 +1,3 @@
-# e906-projects
-e906-root-ana
+# seaquest-projects
 
-Here I put my changes to the original repository of e906-root-ana.
+The repositary contains ``e906-root-ana`` with my changes, supplement codes for ``e906-root-ana`` and backend analysis notebooks. 
