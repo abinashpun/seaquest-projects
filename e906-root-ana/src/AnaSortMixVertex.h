@@ -34,7 +34,6 @@ class AnaSortMixVertex {
   virtual void End();
   virtual void Analyze(const std::string fn_raw, const std::string fn_rec="");
   AnaSortMixVertex(const std::string name="ana_mixvertex");
-  virtual void InitStep2();
 
    
   virtual void SortTree(TTree* tree_to_sort);
