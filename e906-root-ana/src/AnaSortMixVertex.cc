@@ -631,8 +631,7 @@ void AnaSortMixVertex::DoVertex(TTree* input_tree, bool mix_flag)
       recEvent->setEventInfo(12525, 0, eventID++);
       for (int j=0; j<abs(pos_tracks_input->size()); ++j)
         {
-
-	      
+ 	  pos_tracks_hold.push_back(pos_tracks_input->at(j));	      
         }
 
 
