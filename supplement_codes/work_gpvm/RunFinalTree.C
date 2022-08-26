@@ -1,4 +1,4 @@
-/// ROOT macro for the 2nd analysis step.
+/// ROOT macro for making output format consitent with uiuc.
 /**
  * This step processes the outputs of all runs processed by the 1st step (`AnaStep1.C`).
  * Therefore you should include in this step
@@ -9,8 +9,8 @@
 void RunFinalTree()
 {
   gSystem->Load("libE906Ana.so");
-  const char* dir_data="/pnfs/e906/scratch/users/apun/e906-root-ana/target_all";
-  const string ds="67";
+  const char* dir_data="/pnfs/e906/scratch/users/apun/e906-root-ana/target_all"; //Area for reco files (save_sorted, save_mix)
+  const string ds="67"; //roadset
   const verb=1;
   auto ana = new FinalTree();
   //ana->InitStep2();
@@ -19,7 +19,7 @@ void RunFinalTree()
   RunList run_list(ds);
   run_list.Verbosity(verb); // 0=quiet, 1=normal, 2=verbose
 
- for (int i_run =2500; i_run < 3100/*run_list.GetN()*/; i_run++) {
+ for (int i_run = 0; i_run < run_list.GetN(); i_run++) {
     int run_id;
     TFile* file;
     if (run_list.OpenRunFile(dir_data, i_run, run_id, file) != 0) continue;
