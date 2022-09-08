@@ -678,8 +678,8 @@ void FinalTree::AnalyzeGMC(char* input_file)
   result_mc->Branch("nHits2", &nHits2, "nHits2/i");
 
   result_mc->Branch("D1", &D1, "D1/i");
-  result_mc->Branch("D2", &D1, "D2/i");
-  result_mc->Branch("D3", &D1, "D3/i");
+  result_mc->Branch("D2", &D2, "D2/i");
+  result_mc->Branch("D3", &D3, "D3/i");
 
   result_mc->Branch("nHits1St1", &nHits1St1, "nHits1St1/i");
   result_mc->Branch("nHits1St2", &nHits1St2, "nHits1St2/i");
