@@ -41,6 +41,7 @@ class AnaSortMixVertex {
   virtual void DoVertex(TTree* inputtree, bool mix);
   virtual void PrepareMC(char* file_mctree);
   virtual void EmbedMCSignal( char *file_mixed,  char* file_mcsignal);
+  void SetTargetPos( const int target_pos){m_target_pos = target_pos;}
 
   /// Get the name of analysis module.
   std::string Name() const { return m_name; }
@@ -77,9 +78,10 @@ protected:
   TTree* save_mix;
 
 
-  int   runID;
-  int spill_ID;
-  int event_ID;
+  int   runID, m_target_pos;
+  int spill_ID, plus_spill_ID, minus_spill_ID;
+  int event_ID, plus_event_ID, minus_event_ID;
+
   //int rfp00; ///< RF+00
   float rfp00c; ///< RF+00 corrected for the pedestal
   float pot_p00; ///proton number corrsponding to RF+00 (pedestal corrected)

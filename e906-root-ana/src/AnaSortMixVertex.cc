@@ -29,6 +29,7 @@ AnaSortMixVertex::AnaSortMixVertex(const std::string name)
   , m_rec(0)
   , ana_tree(0)
   , mixed_tree(0)
+  , m_target_pos(-1)
 {
   ;
 }
@@ -71,6 +72,7 @@ void AnaSortMixVertex::Analyze(const std::string fn_raw, const std::string fn_re
 {
   TFile* file_raw;
   TTree* tree_raw;
+
   unsigned int n_evt_raw = 0;
   
     file_raw = new TFile(fn_raw.c_str());
@@ -87,6 +89,7 @@ void AnaSortMixVertex::Analyze(const std::string fn_raw, const std::string fn_re
 
   TFile* file_rec;
   TTree* tree_rec;
+
   unsigned int n_evt_rec = 0;
   
     file_rec = new TFile(fn_rec.c_str());
@@ -96,9 +99,11 @@ void AnaSortMixVertex::Analyze(const std::string fn_raw, const std::string fn_re
       exit(1);
     }
     if (! m_rec) m_rec = new SRecEvent();
+
+    SRawEvent *m_org = new SRawEvent();
+    tree_rec->SetBranchAddress("orgEvent", &m_org);
     tree_rec->SetBranchAddress("recEvent", &m_rec);
     n_evt_rec = tree_rec->GetEntries();
-    //cout<<" No. of rec events: "<<n_evt_rec<<endl;
  
 
   unsigned int n_evt_all = 0;
@@ -190,13 +195,14 @@ void AnaSortMixVertex::Analyze(const std::string fn_raw, const std::string fn_re
     liveP =  UtilBeam::PoTLive(spill_ID); 
     TargetPos = m_raw->getTargetPos(); 
 
-    //if(TargetPos !=3) continue;
+    if(m_target_pos>0 && TargetPos != m_target_pos) continue;
 
     if (!m_raw->isTriggeredBy(SRawEvent::MATRIX1)) continue;
     fpga1 = (m_raw->isTriggeredBy(SRawEvent::MATRIX1));
     fpga2 = (m_raw->isTriggeredBy(SRawEvent::MATRIX2));
     fpga3 = (m_raw->isTriggeredBy(SRawEvent::MATRIX3));
     fpga4 = (m_raw->isTriggeredBy(SRawEvent::MATRIX4));
+
     int rfp00 = m_raw->getIntensity(0);
     double qie_ped = e906sc->GetQIEPedestal(spill_ID);
     rfp00c = rfp00 - qie_ped;
@@ -204,13 +210,14 @@ void AnaSortMixVertex::Analyze(const std::string fn_raw, const std::string fn_re
     pot_p00 = coef * rfp00c;
 
  
-    occuD1 = m_raw->getNHitsInD1();
-    occuD2 = m_raw->getNHitsInD2();
-    occuD3p = m_raw->getNHitsInD3p();
-    occuD3m = m_raw->getNHitsInD3m();
+    occuD1 = m_org->getNHitsInD1();
+    occuD2 = m_org->getNHitsInD2();
+    occuD3p = m_org->getNHitsInD3p();
+    occuD3m = m_org->getNHitsInD3m();
  
     int TrkMult = m_rec->getNTracks();
-    //get vector<SRecTrack> for +ve and -ve tracks from rec event
+
+    //Loop to get vector<SRecTrack> for +ve and -ve tracks from rec event
     for (int i =0; i< TrkMult; i++)
       { 
 	SRecTrack recTrack = m_rec->getTrack(i);
@@ -234,21 +241,21 @@ void AnaSortMixVertex::Analyze(const std::string fn_raw, const std::string fn_re
   std::cout<<"\n================Collecting track and envent info Ended, cpu time taken: ==="<< duration <<endl;
 
   ///
-  
+  ///
 
-   SortTree(ana_tree);
-   MixTracks(sorted_tree);
-   DoVertex(sorted_tree, 0);
-   DoVertex(mixed_tree, 1);
+   SortTree(ana_tree); //sort the tree
+   MixTracks(sorted_tree);//Mix the sorted tree
+   DoVertex(sorted_tree, 0);//Vertex the sorted tree
+   DoVertex(mixed_tree, 1);//Vertex the mixed tree
 
   ///
-  //
+  ///
 
-  cout<< endl;
-  
+  cout<< endl; 
 
   if (m_use_raw) file_raw->Close();
   if (m_use_rec) file_rec->Close();
+
 }
 
 
@@ -271,6 +278,7 @@ void AnaSortMixVertex::SortTree(TTree* tree_to_sort)
 {
 
   cout<<"\n\n=================  Sorting starts ===================" <<endl;
+
   std::clock_t start;
   double duration;
   start = std::clock();
@@ -280,12 +288,11 @@ void AnaSortMixVertex::SortTree(TTree* tree_to_sort)
 
 
   Int_t nentries = (Int_t)tree_to_sort->GetEntries();
-  //Drawing variable occuD1 with no graphics option.
-  //variable occD1 stored in array fV1 (see TTree::Draw)
+
   tree_to_sort->Draw("occuD1","","goff");
 
   Int_t *index = new Int_t[nentries];
-  //sorort array containing occuD1 in decreasing order
+  //sort array containing occuD1 in decreasing order
   //The array index contains the entry numbers in decreasing order of occuD1
   TMath::Sort(nentries,tree_to_sort->GetV1(),index);
 
@@ -293,7 +300,7 @@ void AnaSortMixVertex::SortTree(TTree* tree_to_sort)
   cout<<" No. of enteries to be sorted: "<<nentries<<endl;
   for (Int_t i=0;i<nentries;i++) {
     tree_to_sort->GetEntry(index[i]);
-    tree_to_sort->LoadBaskets(999999999999);
+    tree_to_sort->LoadBaskets(2000000000);
     sorted_tree->Fill();
   }
   tree_to_sort->DropBaskets();
@@ -336,7 +343,10 @@ void AnaSortMixVertex::MixTracks(TTree* sorted_tree1)
   mixed_tree->Branch("plus_pot_p00", &plus_pot_p00, "plus_pot_p00/f");
   mixed_tree->Branch("plus_liveP", &plus_liveP, "plus_liveP/f");
   mixed_tree->Branch("plus_TargetPos", &plus_TargetPos, "plus_TargetPos/I");
-  
+  mixed_tree->Branch("plus_spill_ID", &plus_spill_ID, "plus_spill_ID/I");
+  mixed_tree->Branch("plus_event_ID", &plus_event_ID, "plus_event_ID/I"); 
+ 
+
   mixed_tree->Branch("minus_occuD1", &minus_occuD1, "minus_occuD1/I");
   mixed_tree->Branch("minus_occuD2", &minus_occuD2, "minus_occuD2/I");
   mixed_tree->Branch("minus_occuD3m", &minus_occuD3m, "minus_occuD3m/I");
@@ -345,14 +355,15 @@ void AnaSortMixVertex::MixTracks(TTree* sorted_tree1)
   mixed_tree->Branch("minus_pot_p00", &minus_pot_p00, "minus_pot_p00/f");
   mixed_tree->Branch("minus_liveP", &minus_liveP, "minus_liveP/f");
   mixed_tree->Branch("minus_TargetPos", &minus_TargetPos, "minus_TargetPos/I");
-
+  mixed_tree->Branch("minus_spill_ID", &minus_spill_ID, "minus_spill_ID/I");
+  mixed_tree->Branch("minus_event_ID", &minus_event_ID, "minus_event_ID/I");
 
 
   std::vector<SRecTrack>* pos_tracks_ = 0;
   std::vector<SRecTrack>* neg_tracks_ = 0;
 
-  int occuD1_,occuD2_, occuD3p_, occuD3m_,TargetPos_, fpga1_;
-  occuD1_ = occuD2_ = occuD3p_ = occuD3m_ = TargetPos_ = 0;
+  int occuD1_,occuD2_, occuD3p_, occuD3m_,TargetPos_, fpga1_, event_ID_, spill_ID_;
+  occuD1_ = occuD2_ = occuD3p_ = occuD3m_ = TargetPos_ = event_ID_ = spill_ID_ = 0;
   float rfp00c_, pot_p00_, liveP_;
   rfp00c_ = pot_p00_ = liveP_ = 0.0;
 
@@ -367,6 +378,8 @@ void AnaSortMixVertex::MixTracks(TTree* sorted_tree1)
   sorted_tree1->SetBranchAddress("rfp00c", &rfp00c_);
   sorted_tree1->SetBranchAddress("pot_p00", &pot_p00_);
   sorted_tree1->SetBranchAddress("liveP", &liveP_);
+  sorted_tree1->SetBranchAddress("spill_ID", &spill_ID_);
+  sorted_tree1->SetBranchAddress("event_ID", &event_ID_);
 
   cout<<"No. of entries from sorted tree: "<<sorted_tree1->GetEntries()<<endl;
 
@@ -374,8 +387,9 @@ void AnaSortMixVertex::MixTracks(TTree* sorted_tree1)
     {
 
 
-
-      ///Get +ve tracks from ith event  
+      ///
+      ///======= Get +ve tracks from ith event  
+      ///
       sorted_tree1->GetEntry(i_evt);
       plus_fpga1 = fpga1_;
       plus_occuD1 = occuD1_;
@@ -386,14 +400,16 @@ void AnaSortMixVertex::MixTracks(TTree* sorted_tree1)
       plus_rfp00c = rfp00c_;
       plus_pot_p00 = pot_p00_;  
       plus_liveP = liveP_; 
+      plus_event_ID = event_ID_;
+      plus_spill_ID = spill_ID_;
 
       for (int j=0; j<abs(pos_tracks_->size()); ++j)
         {
 	  pos_tracks_mix.push_back(pos_tracks_->at(j));	      
         }
 
-	
-      ///Get -ve tracks from (i+1)th event
+      ///	
+      ///====== Get -ve tracks from (i+1)th event
       ///
       sorted_tree1->GetEntry(i_evt+1);
       minus_fpga1 = fpga1_;
@@ -405,11 +421,12 @@ void AnaSortMixVertex::MixTracks(TTree* sorted_tree1)
       minus_rfp00c = rfp00c_;
       minus_pot_p00 = pot_p00_;  
       minus_liveP = liveP_;
+      minus_event_ID = event_ID_;
+      minus_spill_ID = spill_ID_;
  
       for (int k=0; k<abs(neg_tracks_->size()); ++k) 
         {	
-	  neg_tracks_mix.push_back(neg_tracks_->at(k));
-         
+	  neg_tracks_mix.push_back(neg_tracks_->at(k));         
         }
 
       mixed_tree->Fill();
@@ -424,6 +441,8 @@ void AnaSortMixVertex::MixTracks(TTree* sorted_tree1)
       plus_rfp00c = 0;
       plus_pot_p00 = 0;  
       plus_liveP = 0;
+      plus_event_ID = 0;
+      plus_spill_ID = 0;
 
       minus_occuD1 = 0;
       minus_occuD2 = 0;
@@ -433,8 +452,10 @@ void AnaSortMixVertex::MixTracks(TTree* sorted_tree1)
       minus_rfp00c = 0;
       minus_pot_p00 = 0;  
       minus_liveP = 0;
-  
+      minus_event_ID = 0;
+      minus_spill_ID = 0;  
     }
+
   m_file_out->cd();
   mixed_tree->Write();  
   duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;        
@@ -442,11 +463,8 @@ void AnaSortMixVertex::MixTracks(TTree* sorted_tree1)
 
 }
 
-
-
-
 ////
-
+/// Vertexing 
 void AnaSortMixVertex::DoVertex(TTree* input_tree, bool mix_flag)
 {    
 
@@ -484,6 +502,8 @@ void AnaSortMixVertex::DoVertex(TTree* input_tree, bool mix_flag)
       save_mix->Branch("plus_pot_p00", &plus_pot_p00, "plus_pot_p00/f");
       save_mix->Branch("plus_liveP", &plus_liveP, "plus_liveP/f");
       save_mix->Branch("plus_TargetPos", &plus_TargetPos, "plus_TargetPos/I");
+      save_mix->Branch("plus_spill_ID", &plus_spill_ID, "plus_spill_ID/I");
+      save_mix->Branch("plus_event_ID", &plus_event_ID, "plus_event_ID/I");
 
       save_mix->Branch("minus_fpga1", &minus_fpga1, "minus_fpga1/I");
       save_mix->Branch("minus_occuD1", &minus_occuD1, "minus_occuD1/I");
@@ -494,15 +514,14 @@ void AnaSortMixVertex::DoVertex(TTree* input_tree, bool mix_flag)
       save_mix->Branch("minus_pot_p00", &minus_pot_p00, "minus_pot_p00/f");
       save_mix->Branch("minus_liveP", &minus_liveP, "minus_liveP/f");
       save_mix->Branch("minus_TargetPos", &minus_TargetPos, "minus_TargetPos/I");
-
+      save_mix->Branch("minus_spill_ID", &minus_spill_ID, "minus_spill_ID/I");
+      save_mix->Branch("minus_event_ID", &minus_event_ID, "minus_event_ID/I");
     }
 
   recEvent = new SRecEvent();
   VertexFit* vtxfit = new VertexFit();
   vtxfit->enableOptimization();
 
-
-  int eventID = 0;
   std::vector<SRecTrack> * pos_tracks_input = 0;
   std::vector<SRecTrack> * neg_tracks_input = 0;
 
@@ -517,11 +536,13 @@ void AnaSortMixVertex::DoVertex(TTree* input_tree, bool mix_flag)
   minus_rfp00c_ = minus_pot_p00_ = minus_liveP_ = 0.;
  
   int fpga1_, occuD1_, occuD2_, occuD3p_, occuD3m_, TargetPos_;
+  int  event_ID_, spill_ID_, plus_event_ID_, plus_spill_ID_,minus_event_ID_, minus_spill_ID_;
   occuD1_ =  occuD2_ = occuD3p_ = occuD3m_ =TargetPos_ = 0;
+  event_ID_=spill_ID_=plus_event_ID_ = plus_spill_ID_ = minus_event_ID_ = minus_spill_ID_= 0;
+
   float rfp00c_, pot_p00_ , liveP_;
   rfp00c_ = pot_p00_ =  liveP_ = 0;
  
-
   input_tree->SetBranchAddress("pos_tracks", &pos_tracks_input);
   input_tree->SetBranchAddress("neg_tracks", &neg_tracks_input);
 
@@ -536,6 +557,8 @@ void AnaSortMixVertex::DoVertex(TTree* input_tree, bool mix_flag)
       input_tree->SetBranchAddress("plus_pot_p00", &plus_pot_p00_);
       input_tree->SetBranchAddress("plus_liveP", &plus_liveP_);
       input_tree->SetBranchAddress("plus_TargetPos", &plus_TargetPos_);
+      input_tree->SetBranchAddress("plus_spill_ID", &plus_spill_ID_);
+      input_tree->SetBranchAddress("plus_event_ID", &plus_event_ID_);
 
       input_tree->SetBranchAddress("minus_fpga1", &minus_fpga1_);
       input_tree->SetBranchAddress("minus_occuD1", &minus_occuD1_);
@@ -546,6 +569,8 @@ void AnaSortMixVertex::DoVertex(TTree* input_tree, bool mix_flag)
       input_tree->SetBranchAddress("minus_pot_p00", &minus_pot_p00_);
       input_tree->SetBranchAddress("minus_liveP", &minus_liveP_);
       input_tree->SetBranchAddress("minus_TargetPos", &minus_TargetPos_);
+      input_tree->SetBranchAddress("minus_spill_ID", &minus_spill_ID_);
+      input_tree->SetBranchAddress("minus_event_ID", &minus_event_ID_);
     }
   else
     {
@@ -558,6 +583,8 @@ void AnaSortMixVertex::DoVertex(TTree* input_tree, bool mix_flag)
       input_tree->SetBranchAddress("rfp00c", &rfp00c_);
       input_tree->SetBranchAddress("pot_p00", &pot_p00_);
       input_tree->SetBranchAddress("liveP", &liveP_);
+      input_tree->SetBranchAddress("spill_ID", &spill_ID_);
+      input_tree->SetBranchAddress("event_ID", &event_ID_);
     }
 
   for(int i_evt=0;i_evt<input_tree->GetEntries();i_evt++) 
@@ -574,6 +601,8 @@ void AnaSortMixVertex::DoVertex(TTree* input_tree, bool mix_flag)
       plus_rfp00c = 0;
       plus_pot_p00 = 0;  
       plus_liveP = 0;
+      plus_spill_ID = 0;
+      plus_event_ID = 0;
 
       minus_occuD1 = 0;
       minus_occuD2 = 0;
@@ -583,6 +612,8 @@ void AnaSortMixVertex::DoVertex(TTree* input_tree, bool mix_flag)
       minus_rfp00c = 0;
       minus_pot_p00 = 0;  
       minus_liveP = 0;
+      minus_spill_ID = 0;
+      minus_event_ID = 0;
 
       plus_fpga1 = plus_fpga1_;
       plus_occuD1 = plus_occuD1_;
@@ -593,6 +624,8 @@ void AnaSortMixVertex::DoVertex(TTree* input_tree, bool mix_flag)
       plus_rfp00c = plus_rfp00c_;
       plus_pot_p00 = plus_pot_p00_;  
       plus_liveP = plus_liveP_;
+      plus_spill_ID = plus_spill_ID_;
+      plus_event_ID = plus_event_ID_;
       
       minus_fpga1 = plus_fpga1_;
       minus_occuD1 = minus_occuD1_;
@@ -603,6 +636,8 @@ void AnaSortMixVertex::DoVertex(TTree* input_tree, bool mix_flag)
       minus_rfp00c = minus_rfp00c_;
       minus_pot_p00 = minus_pot_p00_;  
       minus_liveP = minus_liveP_;
+      minus_spill_ID = minus_spill_ID_;
+      minus_event_ID = minus_event_ID_;
       
       occuD1 = 0;
       occuD2 = 0;
@@ -628,7 +663,6 @@ void AnaSortMixVertex::DoVertex(TTree* input_tree, bool mix_flag)
       if(i_evt%1000==0) cout<<"No. of events analyzed: "<<i_evt<<endl;
       std::vector<SRecTrack>  pos_tracks_hold, neg_tracks_hold ;
    
-      recEvent->setEventInfo(12525, 0, eventID++);
       for (int j=0; j<abs(pos_tracks_input->size()); ++j)
         {
  	  pos_tracks_hold.push_back(pos_tracks_input->at(j));	      
@@ -651,6 +685,7 @@ void AnaSortMixVertex::DoVertex(TTree* input_tree, bool mix_flag)
 
 	      recEvent->insertTrack(neg_tracks_hold.at(k));
 	      recEvent->insertTrack(pos_tracks_hold.at(j));    
+              recEvent->setEventInfo(m_run_id,spill_ID_,event_ID_);
 	      vtxfit->setRecEvent(recEvent);
               
 	      if(mix_flag) save_mix->Fill();
