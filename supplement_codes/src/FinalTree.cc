@@ -14,12 +14,15 @@ using namespace std;
 
 void FinalTree::AnalyzeData_Mix (const int run_id, TFile * file_in)
 {
-  TFile* fout = new TFile (Form("result_LD2_new/result_run%i.root",run_id),"recreate");
+
+  //if(!m_dir_out) cout<<"No output directory found"<<endl;
+  TFile* fout = new TFile (Form("test_dir/result_run%i.root",run_id),"recreate");
   TTree* result= new TTree("result", "The tree for final results");
 
   /// Run and event level info
   result->Branch("runID", &runID, "runID/I");
   result->Branch("spillID", &spillID, "spillID/I");
+  result->Branch("eventID", &eventID, "eventID/I");
   result->Branch("D1", &D1, "D1/I");///DC occupancy at st. 1
   result->Branch("D2", &D2, "D2/I"); ///DC occupancy at st. 2
   result->Branch("D3", &D3, "D3/I"); ///DC occupancy at st. 3
@@ -139,40 +142,12 @@ void FinalTree::AnalyzeData_Mix (const int run_id, TFile * file_in)
       if (rec_unmixed->getNDimuons()<1) continue;
 
       ///Initializations
-      spillID = 0.;
-      runID = 0.;
-      D1 = -9999;
-      D2 =-9999;
-      D3 =-9999;
-      occuD3p = -9999;
-      occuD3m = -9999;
-      targetPos = -9999;
-      rfp00c = -9999;
-      pot_p00 = -9999;
-      liveP = -9999;
- 
-      dx = -9999.0;
-      dy = -9999.0;
-      dz = -9999.0;
-      dpx = -9999.0;
-      dpy = -9999.0;
-      dpz = -9999.0;
-      chisq_dimuon = 0.;
-      chisq_upstream = 0.;
-      chisq_target = 0.;
-      chisq_dump = 0.;
-
-
-      pT = -999.;
-      xT = -999.;
-      xB = -999.;
-      xF = -999.;
-      costh = -999.;
-      phi = -999.;
-      mass = -999.;
-      ntrk_pz_st3 = -999.;
+      ResetVars();
 
       runID= rec_unmixed->getRunID();
+      spillID = rec_unmixed->getSpillID();
+      eventID = rec_unmixed->getEventID();
+  
       D1 = D1_;
       D2 = D2_;
       D3 = occuD3p_ + occuD3m_;
@@ -291,23 +266,16 @@ void FinalTree::AnalyzeData_Mix (const int run_id, TFile * file_in)
 
 
 
-
-
-
   ///============================================================================================
   ///------------------------------------mixed---------------------------------
-  ///
-  int ptrk_TargetPos, ptrk_D1,  ptrk_D2,  ptrk_occuD3m, ptrk_occuD3p;
-  float ptrk_rfp00c, ptrk_pot_p00, ptrk_liveP; 
-  int ntrk_TargetPos, ntrk_D1,  ntrk_D2,  ntrk_occuD3m, ntrk_occuD3p;
-  float ntrk_rfp00c, ntrk_pot_p00, ntrk_liveP; 
+  ///============================================================================================
   TTree* result_mix= new TTree("result_mix", "The tree for final results");
   /// Run and event level info
   result_mix->Branch("runID", &runID, "runID/I");
   result_mix->Branch("spillID", &spillID, "spillID/I");
   result_mix->Branch("D1", &D1, "D1/i");
-  result_mix->Branch("D2", &D1, "D2/i");
-  result_mix->Branch("D3", &D1, "D3/i");
+  result_mix->Branch("D2", &D2, "D2/i");
+  result_mix->Branch("D3", &D3, "D3/i");
   result_mix->Branch("ptrk_D1", &ptrk_D1, "ptrk_D1/I");///DC occupancy at st. 1
   result_mix->Branch("ptrk_D2", &ptrk_D2, "ptrk_D2/I"); ///DC occupancy at st. 2
   result_mix->Branch("ptrk_occuD3m", &ptrk_occuD3m, "ptrk_occuD3m/I"); ///DC occupancy at st. 3m
@@ -453,40 +421,9 @@ void FinalTree::AnalyzeData_Mix (const int run_id, TFile * file_in)
       mixed->GetEntry(i_evt);
       if (rec_mixed->getNDimuons()<1) continue;
 
-      ptrk_D1 = -9999;
-      ptrk_D2 =-9999;
-      ptrk_occuD3p = -9999;
-      ptrk_occuD3m = -9999;
-      ptrk_TargetPos = -9999;
-      ptrk_rfp00c = -9999;
-      ptrk_pot_p00 = -9999;
-      ptrk_liveP = -9999;
-      ptrk_D1 = -9999;
-      ptrk_D2 =-9999;
-      ptrk_occuD3p = -9999;
-      ptrk_occuD3m = -9999;
-      ptrk_TargetPos = -9999;
-      ptrk_rfp00c = -9999;
-      ptrk_pot_p00 = -9999;
-      ptrk_liveP = -9999;
-
-      vtx_x = -999.;
-      vtx_y = -999.;
-      vtx_z = -999.;
-      chisq_dimuon = -999.0;
-      chisq_upstream = -999.0;
-      chisq_target = -999.0;
-      chisq_dump = -999.0;
-
-
-      pT = -999.;
-      xT = -999.;
-      xB = -999.;
-      xF = -999.;
-      costh = -999.;
-      phi = -999.;
-      mass = -999.;
-
+      /// Initialization
+      ResetVars();
+  
       runID= rec_mixed->getRunID();
 
       ptrk_D1 = plus_D1;
@@ -767,41 +704,7 @@ void FinalTree::AnalyzeGMC(char* input_file)
       mc_save->GetEntry(i_evt);
 
       ///Initializations
-      spillID = 0.;
-      runID = 0.;
-      eventID =0;
-
-      nHits1St1=-999; nHits1St2=-999;nHits1St3=-999;
-      nHits2St1=-999; nHits2St2=-999;nHits2St3=-999;
-
-      vtx_x = -999.;
-      vtx_y = -999.;
-      vtx_z = -999.;
-      chisq_dimuon = -999.;
-      chisq_upstream = -999.;
-      chisq_target = -999.;
-      chisq_dump = -999.;
-
-      pT = -999.;
-      xT = -999.;
-      xB = -999.;
-      xF = -999.;
-      costh = -999.;
-      phi = -999.;
-      mass = -999.;
-
-      px1=-9999.0; py1=-9999.0;pz1=-9999.0;
-      px2=-9999.0; py2=-9999.0;pz2=-9999.0;
-
-      x2_t =-9999.0; y2_t=-9999.0; x2_d =-9999.0; y2_d=-9999.0;
-      x1_t =-9999.0; y1_t=-9999.0; x1_d =-9999.0; y1_d=-9999.0;
-
-      px1_st1 =-9999.0; py1_st1=-9999.0; pz1_st1=-9999.0; px2_st1=-9999.0; py2_st1=-9999.0; pz2_st1=-9999.0;
-      px1_st3 =-9999.0; py1_st3=-9999.0; pz1_st3=-9999.0; px2_st3=-9999.0; py2_st3=-9999.0; pz2_st3=-9999.0;
-
-      chisq2 =-9999.0; chisq2_upstream =-9999.0; chisq2_target=-9999.0;chisq2_dump =-9999.0;
-      chisq1 =-9999.0; chisq1_upstream =-9999.0; chisq1_target=-9999.0;chisq1_dump =-9999.0;
-      nHits1=-999; nHits2=-999;
+      ResetVars(); 
 
       float m_muon = 0.1056;
       spillID = mc_raw->getSpillID();
@@ -972,4 +875,96 @@ void FinalTree::AnalyzeGMC(char* input_file)
     }
   fout->cd();
   result_mc->Write();
+}
+
+void FinalTree::ResetVars()
+{
+
+      spillID = 0.;
+      runID = 0.;
+      D1 = -9999;
+      D2 =-9999;
+      D3 =-9999;
+      occuD3p = -9999;
+      occuD3m = -9999;
+      targetPos = -9999;
+      rfp00c = -9999;
+      pot_p00 = -9999;
+      liveP = -9999;
+
+      dx = -9999.0;
+      dy = -9999.0;
+      dz = -9999.0;
+      dpx = -9999.0;
+      dpy = -9999.0;
+      dpz = -9999.0;
+
+
+      chisq_dimuon = -999.0;
+      chisq_upstream = -999.0;
+      chisq_target = -999.0;
+      chisq_dump = -999.0;
+
+      pT = -999.;
+      xT = -999.;
+      xB = -999.;
+      xF = -999.;
+      costh = -999.;
+
+      ptrk_D1 = -9999;
+      ptrk_D2 =-9999;
+      ptrk_occuD3p = -9999;
+      ptrk_occuD3m = -9999;
+      ptrk_TargetPos = -9999;
+      ptrk_rfp00c = -9999;
+      ptrk_pot_p00 = -9999;
+
+
+      ntrk_D1 = -9999;
+      ntrk_D2 = -9999;
+      ntrk_occuD3p = -9999;
+      ntrk_occuD3m = -9999;
+      ntrk_TargetPos = -9999;
+      ntrk_rfp00c = -9999;
+      ntrk_pot_p00 = -9999;
+      ntrk_liveP = -9999;
+
+      vtx_x = -999.;
+      vtx_y = -999.;
+      vtx_z = -999.;
+
+      mass = -999.;
+
+//mc
+      eventID =0;
+
+      nHits1St1=-9999; nHits1St2=-9999;nHits1St3=-9999;
+      nHits2St1=-9999; nHits2St2=-9999;nHits2St3=-9999;
+
+      vtx_x = -9999.;
+      vtx_y = -9999.;
+      vtx_z = -9999.;
+      chisq_dimuon = -9999.;
+      chisq_upstream = -9999.;
+      chisq_target = -9999.;
+      chisq_dump = -9999.;
+
+
+      px1=-9999.0; py1=-9999.0;pz1=-9999.0;
+      px2=-9999.0; py2=-9999.0;pz2=-9999.0;
+
+      x2_t =-9999.0; y2_t=-9999.0; 
+      x2_d =-9999.0; y2_d=-9999.0;
+      x1_t =-9999.0; y1_t=-9999.0; 
+      x1_d =-9999.0; y1_d=-9999.0;
+  
+      px1_st1 =-9999.0; py1_st1=-9999.0; pz1_st1=-9999.0; 
+      px2_st1=-9999.0; py2_st1=-9999.0; pz2_st1=-9999.0;
+      px1_st3 =-9999.0; py1_st3=-9999.0; pz1_st3=-9999.0; 
+      px2_st3=-9999.0; py2_st3=-9999.0; pz2_st3=-9999.0;
+
+      chisq2 =-9999.0; chisq2_upstream =-9999.0; chisq2_target=-9999.0;chisq2_dump =-9999.0;
+      chisq1 =-9999.0; chisq1_upstream =-9999.0; chisq1_target=-9999.0;chisq1_dump =-9999.0;
+      nHits1=-999; nHits2=-999;
+
 }
