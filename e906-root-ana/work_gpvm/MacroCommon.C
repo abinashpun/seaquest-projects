@@ -5,7 +5,8 @@
   ///
   //auto ana = new AnaOccupancy();
   //auto ana = new AnaHitMatrix();
-  auto ana = new AnaHodoTime();
+  //auto ana = new AnaHodoTime();
   //auto ana = new AnaChamHit();
   //auto ana = new AnaNim3();
+  auto ana = new AnaSortMixVertex();
 }

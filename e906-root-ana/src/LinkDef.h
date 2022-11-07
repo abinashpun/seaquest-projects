@@ -12,7 +12,9 @@
 #pragma link C++ class AnaHodoTime-!;
 #pragma link C++ class AnaChamHit-!;
 #pragma link C++ class AnaDimuon-!;
-
+#pragma link C++ class AnaSortMixVertex-!;
+//#pragma link C++ class VertexFitDump-!;
+//#pragma link C++ class FinalTree-!;
 // Data classes
 //   Defined in TreeData.(h|cc) & Ana*.(h|cc)
 #pragma link C++ class EventData+;
