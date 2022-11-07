@@ -11,6 +11,7 @@ class TH1;
 struct Nim3Data {
   int   run_id;
   int spill_id;
+  int  tgt_pos;
   int event_id;
   int  turn_id;
   int    rf_id;
@@ -23,6 +24,10 @@ struct Nim3Data {
   float pot_p01;
   float pot_p00;
   float pot_m01;
+  int occ_D0;
+  int occ_D1;
+  int occ_D2;
+  int occ_D3;
   Nim3Data() {;}
   virtual ~Nim3Data() {;}
   ClassDef(Nim3Data, 1);
@@ -30,25 +35,33 @@ struct Nim3Data {
 
 /// Analysis module to extract key variables of NIM3 events.
 class AnaNim3 : public AnaBase {
-  /// Output
+  ///
+  /// For step 1
+  ///
   TH1* m_h1_count; // event counts
-
   TTree*   m_tree;
   Nim3Data m_data;
 
-  TH1* m_h1_rfp01;
-  TH1* m_h1_rfp00;
-  TH1* m_h1_rfm01;
-
-  TH1* m_h1_pot_p01;
-  TH1* m_h1_pot_p00;
-  TH1* m_h1_pot_m01;
+  ///
+  /// For step 2
+  ///
+  ofstream m_ofs_inte;
+  TFile* m_file_out2;
+  TH2* m_h2_turn_rf[10]; // [tgt_pos]
+  TH1* m_h1_rfp00  [10]; // [tgt_pos]
+  TH1* m_h1_rfp00c [10]; // [tgt_pos]
+  TH1* m_h1_pot_p00[10]; // [tgt_pos]
+  TH1* m_h1_occ_D1 [10]; // [tgt_pos]
 
  public:
   AnaNim3(const std::string name="ana_nim3");
   virtual ~AnaNim3();
   void Init();
   void End();
+
+  void InitStep2();
+  void AnalyzeStep2(const int run_id, TFile* file_in);
+  void EndStep2();
 
  protected:
   void AnalyzeEvent();

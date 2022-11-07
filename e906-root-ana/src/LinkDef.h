@@ -9,6 +9,7 @@
 #pragma link C++ class AnaNim3-!;
 #pragma link C++ class AnaOccupancy-!;
 #pragma link C++ class AnaHitMatrix-!;
+#pragma link C++ class AnaHitTree-!;
 #pragma link C++ class AnaHodoTime-!;
 #pragma link C++ class AnaChamHit-!;
 #pragma link C++ class AnaDimuon-!;

@@ -46,11 +46,17 @@ void AnaBase::Init()
 
   m_ofs.open((m_dir_out + "/output.txt").c_str());
   m_file_out = new TFile((m_dir_out + "/output.root").c_str(), "RECREATE");
-  if (! gSystem->AccessPathName("opts/dataset_6.opts")) { // found
-    JobOptsSvc::instance()->init("opts/dataset_6.opts");
-  } else {
-    JobOptsSvc::instance()->init("$KTRACKER_ROOT/opts/run6.opts");
+
+  string fn_opts;
+  if (m_ds != "") fn_opts = "opts/dataset_" + m_ds + ".opts";
+  else            fn_opts = "opts/dataset_6.opts";
+  if (gSystem->AccessPathName(fn_opts.c_str())) { // Not found
+    cout << "Cannot find '" << fn_opts << "'." << endl;
+    fn_opts = "$KTRACKER_ROOT/" + fn_opts;
   }
+  cout << "Load '" << fn_opts << "'." << endl;
+  JobOptsSvc::instance()->init(fn_opts.c_str());
+
   GeomSvc::instance()->init();
 }
 
