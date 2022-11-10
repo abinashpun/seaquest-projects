@@ -20,7 +20,7 @@ source /cvmfs/seaquest.opensciencegrid.org/seaquest/software/SL7/seaquest/kTrack
 The script `runGMC.py` for submitting the gereration is available in `kei_dev` branch of the ["SeaQuest Distribution"](https://cdcvs.fnal.gov/redmine/projects/seaquest-ktracker/repository/revisions/kei_dev/show). 
 Copy the script in your working area and run it as follows;
 ```
-./runGMC_root.py --grid --server=e906-db4.fnal.gov --port=3306 --raw-name=test_delete --n-events=100000 --n-subruns=5 --geometry=geometry_G18_run3 --gmc-args="/set/beamYOffset 1.6 cm" --Target=H --EventPosition=Dump --Generator=JPsi --Acceptance=Acc --gmc-args="/set/fmagMultiplier -1.044" --gmc-args="/set/kmagMultiplier -1.025" --grid-args="--expected-lifetime=6h" --gmc-args="/set/recordTo root" --outdir=/pnfs/e906/scratch/users/apun/GMC/generated --first-subrun=0 --osg
+./runGMC.py --grid --server=e906-db4.fnal.gov --port=3306 --raw-name=test_delete --n-events=100000 --n-subruns=5 --geometry=geometry_G18_run3 --gmc-args="/set/beamYOffset 1.6 cm" --Target=H --EventPosition=Dump --Generator=JPsi --Acceptance=Acc --gmc-args="/set/fmagMultiplier -1.044" --gmc-args="/set/kmagMultiplier -1.025" --grid-args="--expected-lifetime=6h" --gmc-args="/set/recordTo root" --outdir=/pnfs/e906/scratch/users/apun/GMC/generated --first-subrun=0 --osg
 ``` 
 You can tune the arguments as you need. Some of the main arguments are;\
 `Generator`: Here you choose which process you want to run for the dimuon genration. Possible options are DY/JPsi/PsiPrime\
@@ -28,5 +28,21 @@ You can tune the arguments as you need. Some of the main arguments are;\
 `first-subrun`: Sets the random seed for your subruns.
 
 More about the argument and process is explained in detail on [SeaQuest Monte Carlo wiki page](https://cdcvs.fnal.gov/redmine/projects/seaquest-gmc/wiki/Running_GMC_on_Fermigrid) by Kei.
+
+## Realization and Embedding 
+
+For realization and embedding you need to get `seaquest-ktracker` repository and build it.
+```
+git clone http://p-seaquest-ktracker@cdcvs.fnal.gov/cvs/projects/seaquest-ktracker
+source /cvmfs/seaquest.opensciencegrid.org/seaquest/software/current/Distribution/setup/setup.sh
+``` 
+For now you need to checkout to `kei_dev` branch and follow README.md of the repository. The scripts for running the realization (`process_realization.sh` and `process_embed_*.sh`) are found in the location: `seaquest-ktracker/scripts/embed`
+
+### Realization
+In this step, the hits are moved randomly (following gaussian distribution) to mimic the resolution of the detector and also some of them are dropped to mimic the efficiency of detecor. The script `process_realization.sh` is modified and new script `process_all_realization.sh` is added to realize multiple files at the same time.
+
+Input: Truth infor from generated step\
+Output: *\_real.root
+
 
 
