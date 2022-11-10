@@ -48,11 +48,36 @@ Output:` *_real.root`
  
 ### Embedding
 
-In this step, the NM3 (minimum Biased) trigger hits are added to the realized hits to mimic the real data scenario. Two kind of methods of Embedding are available, occupancy (Jason's method) and intensity (Kei's method) based. For our study, we use the Kei's method. Details on Kei's method is documented in [DocDB-2630](https://seaquest-docdb.fnal.gov/cgi-bin/sso/RetrieveFile?docid=2630&filename=messyMC.pdf&version=2). New script `process_all_embed.sh` is added to embed multiple file. 
+In this step, the NIM3 (minimum Biased) trigger hits are embeded to the realized hits to mimic the real data scenario. Two kinds of methods of Embedding are available, occupancy (Jason's method) and intensity (Kei's method) based. For our study, we use the Kei's method. Details on Kei's method is documented in [DocDB-2630](https://seaquest-docdb.fnal.gov/cgi-bin/sso/RetrieveFile?docid=2630&filename=messyMC.pdf&version=2). New script `process_all_embed.sh` is added to embed multiple file. 
 
 Input: Output from realization step (`*real.root`)\
 Output:` *_real_messy.root` and `*_real_clean.root`
 
 ## Tracking and Reconstruction
 
+In this step, the embedded hits are used to create muon tracks from ktraker method. The script for running the tracking is `seaquest-ktracker/scripts/grid/submitAll.py`.  
+
+```
+source /e906/app/software/osg/software/current/setup.sh
+source /cvmfs/seaquest.opensciencegrid.org/seaquest/software/SL7/seaquest/kTrackerRun5/setup.sh
+```
+
+Follow EXACTLY same order to source the scripts above and run the tracking script as
+
+```
+ ./submitAll.py -m -j track -l list_track.txt -c tracking.conf -n 1 -s 20
+```
+-n argument is to split the input file into the multiple jobs if needed\
+-s argument is number of input file passed\
+
+- tracking.conf: configuration file for tracking. It inludes the input/output file path and .opt files for reconstruction. All these should be placed in \pnfs\ area to get access from grid nodes.
+- list\_track.txt: list of files for input (choose ` *_real_messy.root` and/or `*_real_clean.root`). The sample script to create such list is provided as `make-input-list.sh`
+
+ 
+## Vertexing
+This is the final step where two tracks are combined to form a dimuon. The output from tracking (`track_*.root`)is used as input for this process. The method of running this process is same as the tracking process, only difference being using `vertex` argument.
+
+```
+ ./submitAll.py -m -j vertex -l list_vertex.txt -c vertex.conf -n 1 -s 20
+```
 
