@@ -35,14 +35,24 @@ For realization and embedding you need to get `seaquest-ktracker` repository and
 ```
 git clone http://p-seaquest-ktracker@cdcvs.fnal.gov/cvs/projects/seaquest-ktracker
 source /cvmfs/seaquest.opensciencegrid.org/seaquest/software/current/Distribution/setup/setup.sh
+source seaquest-ktracker/setup.sh
 ``` 
-For now you need to checkout to `kei_dev` branch and follow README.md of the repository. The scripts for running the realization (`process_realization.sh` and `process_embed_*.sh`) are found in the location: `seaquest-ktracker/scripts/embed`
+For now you need to checkout to `kei_dev` branch and follow README.md of the repository. The scripts for running the realization (`process_realization.sh` and `process_embed_*.sh`) are found in the location: `seaquest-ktracker/scripts/embed`. These two methods are performed in gpvm machine itself. Embedding process takes relatively longer time than realization.
 
 ### Realization
+
 In this step, the hits are moved randomly (following gaussian distribution) to mimic the resolution of the detector and also some of them are dropped to mimic the efficiency of detecor. The script `process_realization.sh` is modified and new script `process_all_realization.sh` is added to realize multiple files at the same time.
 
-Input: Truth infor from generated step\
-Output: *\_real.root
+Input: Truth info from generated step\
+Output:` *_real.root`
+ 
+### Embedding
 
+In this step, the NM3 (minimum Biased) trigger hits are added to the realized hits to mimic the real data scenario. Two kind of methods of Embedding are available, occupancy (Jason's method) and intensity (Kei's method) based. For our study, we use the Kei's method. Details on Kei's method is documented in [DocDB-2630](https://seaquest-docdb.fnal.gov/cgi-bin/sso/RetrieveFile?docid=2630&filename=messyMC.pdf&version=2). New script `process_all_embed.sh` is added to embed multiple file. 
+
+Input: Output from realization step (`*real.root`)\
+Output:` *_real_messy.root` and `*_real_clean.root`
+
+## Tracking and Reconstruction
 
 
