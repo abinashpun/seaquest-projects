@@ -23,9 +23,9 @@ Copy the script in your working area and run it as follows;
 ./runGMC_root.py --grid --server=e906-db4.fnal.gov --port=3306 --raw-name=test_delete --n-events=100000 --n-subruns=5 --geometry=geometry_G18_run3 --gmc-args="/set/beamYOffset 1.6 cm" --Target=H --EventPosition=Dump --Generator=JPsi --Acceptance=Acc --gmc-args="/set/fmagMultiplier -1.044" --gmc-args="/set/kmagMultiplier -1.025" --grid-args="--expected-lifetime=6h" --gmc-args="/set/recordTo root" --outdir=/pnfs/e906/scratch/users/apun/GMC/generated --first-subrun=0 --osg
 ``` 
 You can tune the arguments as you need. Some of the main arguments are;\
-Generator: Here you choose which process you want to run for the dimuon genration. Possible options are "DY/JPsi/PsiPrime" \ 
-Acceptance: Choose you want to get the particles in 4-pi (4pi) or rough detector acceptance (acc).\
-first-subrun: Sets the random seed for your subruns.
+`Generator`: Here you choose which process you want to run for the dimuon genration. Possible options are "DY/JPsi/PsiPrime"\ 
+`Acceptance`: Choose you want to get the particles in 4-pi (4pi) or rough detector acceptance (acc).\
+`first-subrun`: Sets the random seed for your subruns.
 
 More about the argument and process is explained in detail on [SeaQuest Monte Carlo wiki page](https://cdcvs.fnal.gov/redmine/projects/seaquest-gmc/wiki/Running_GMC_on_Fermigrid) by Kei.
 
