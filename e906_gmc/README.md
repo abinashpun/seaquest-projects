@@ -20,9 +20,10 @@ source /cvmfs/seaquest.opensciencegrid.org/seaquest/software/SL7/seaquest/kTrack
 The script `runGMC.py` for submitting the gereration is available in `kei_dev` branch of the ["SeaQuest Distribution"](https://cdcvs.fnal.gov/redmine/projects/seaquest-ktracker/repository/revisions/kei_dev/show). 
 Copy the script in your working area and run it as follows;
 ```
-./runGMC.py --grid --server=e906-db4.fnal.gov --port=3306 --raw-name=test_delete --n-events=100000 --n-subruns=5 --geometry=geometry_G18_run3 --gmc-args="/set/beamYOffset 1.6 cm" --Target=H --EventPosition=Dump --Generator=JPsi --Acceptance=Acc --gmc-args="/set/fmagMultiplier -1.044" --gmc-args="/set/kmagMultiplier -1.025" --grid-args="--expected-lifetime=6h" --gmc-args="/set/recordTo root" --outdir=/pnfs/e906/scratch/users/apun/GMC/generated --first-subrun=0 --osg
+./runGMC.py --grid --preset=run3 --Record=ROOT --server=e906-db3.fnal.gov --raw-name=gmc_name --n-events=1000 --n-subruns=100 --Target=H --EventPosition=Dump --Generator=DY --Acceptance=Acc --grid-args="--expected-lifetime=24h" - --outdir=/path/to/output --first-subrun=0 --osg
 ``` 
 You can tune the arguments as you need. Some of the main arguments are;\
+`preset=run3` sets the magnet polarity, the beam offset, and the geometry\
 `Generator`: Here you choose which process you want to run for the dimuon genration. Possible options are DY/JPsi/PsiPrime\
 `Acceptance`: Choose you want to get the particles in 4-pi (4pi) or rough detector acceptance (acc).\
 `first-subrun`: Sets the random seed for your subruns.
