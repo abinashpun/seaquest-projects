@@ -42,7 +42,7 @@ For now you need to checkout to `kei_dev` branch and follow README.md of the rep
 
 ### Realization
 
-In this step, the hits' position is changed randomly (following gaussian distribution with resoulution of 400 $$mu m$$) to mimic the resolution of the detector and also some of them are dropped to mimic the efficiency (94%) of detecor. The script `process_realization.sh` is modified and new script `process_all_realization.sh` is added to realize multiple files at the same time.
+In this step, the hits' position is changed randomly (following gaussian distribution with resoulution of 400 $\mum$) to mimic the resolution of the detector and also some of them are dropped to mimic the efficiency (94%) of detecor. The script `process_realization.sh` is modified and new script `process_all_realization.sh` is added to realize multiple files at the same time.
 
 ```
 ./process_all_realization.sh
