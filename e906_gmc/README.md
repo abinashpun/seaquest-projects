@@ -4,7 +4,7 @@ A documentation of guide to run the GMC in e906 framework with root method (i.e.
 The GMC is performed in multisteps in e906.
 1. Generation
 2. Realization
-3. Embedding NM4 Hits
+3. Embedding NIM3 Hits
 4. Tracking and Reconstruction
 5. Vertexing
 
