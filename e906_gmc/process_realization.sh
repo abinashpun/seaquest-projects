@@ -9,7 +9,7 @@ command=realization
 FILENAME_BASE=$1
 
 ############ EDIT HERE ############
-OPT=opts/realization.opts
+OPT=opts/default.opts
 INPUT_FILE_PATH=/path/to/generated/input
 OUTPUT_FILE_PATH=/path/to/realized/output
 SEED=1 #### random seed

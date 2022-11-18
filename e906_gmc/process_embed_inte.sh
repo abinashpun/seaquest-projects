@@ -6,7 +6,7 @@ TARG=("dummy" "LH2" "empty" "LD2" "NONE" "Fe" "C" "W")
 command=eventMixer_inte
 ############ EDIT HERE ############
 FILENAME_BASE=$1
-OPT=opts/embed.opts
+OPT=opts/default.opts
 
 INPUT_FILE_PATH=/path/to/realized/input
 OUTPUT_FILE_PATH=/path/to/embed/output
