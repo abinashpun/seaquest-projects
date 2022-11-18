@@ -20,7 +20,7 @@ The script `runGMC.py` for submitting the gereration is available in `kei_dev` b
 
 Copy the script in your working area and run it as follows;
 ```
-./runGMC.py --grid --preset=run3 --Record=ROOT --server=e906-db3.fnal.gov --raw-name=gmc_name --n-events=1000 --n-subruns=100 --Target=H --EventPosition=Dump --Generator=DY --Acceptance=Acc --grid-args="--expected-lifetime=24h" - --outdir=/path/to/output --first-subrun=0
+./runGMC.py --grid --preset=run3 --Record=ROOT --server=e906-db3.fnal.gov --raw-name=gmc_name --n-events=1000 --n-subruns=100 --Target=H --EventPosition=Dump --Generator=DY --Acceptance=Acc --grid-args="--expected-lifetime=24h  --memory=2GB --disk=5GB" - --outdir=/path/to/output --first-subrun=0
 ``` 
 You can tune the arguments as you need. Some of the main arguments are;\
 `preset=run3` sets the magnet polarity, the beam offset, and the geometry\
