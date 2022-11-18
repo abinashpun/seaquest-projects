@@ -16,7 +16,7 @@ One need not have to build from scratch as there is already standard kTracker li
 source /e906/app/software/osg/software/current/setup.sh
 ``` 
 
-The script `runGMC.py` for submitting the gereration is available in `kei_dev` branch of the ["SeaQuest Distribution"](https://cdcvs.fnal.gov/redmine/projects/seaquest-ktracker/repository/revisions/kei_dev/show). 
+The script `runGMC.py` for submitting the gereration is available in `kei_dev` branch of the ["SeaQuest Distribution"](https://cdcvs.fnal.gov/redmine/projects/seaquest-distribution/repository/show/seaquest_scripts?utf8=%E2%9C%93&rev=kei_dev). 
 
 Copy the script in your working area and run it as follows;
 ```
