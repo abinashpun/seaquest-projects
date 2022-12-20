@@ -25,7 +25,7 @@ Copy the script in your working area and run it as follows;
 You can tune the arguments as you need. Some of the main arguments are;\
 `preset=run3` sets the magnet polarity, the beam offset, and the geometry\
 `Generator`: Here you choose which process you want to run for the dimuon genration. Possible options are DY/JPsi/PsiPrime\
-`Acceptance`: Choose you want to get the particles in 4-pi (4pi) or rough detector acceptance (acc).\
+`Acceptance`: Choose you want to get the particles in 4-pi (All) or rough detector acceptance (acc).\
 `first-subrun`: Sets the random seed for your subruns.
 
 More about the argument and process is explained in detail on [SeaQuest Monte Carlo wiki page](https://cdcvs.fnal.gov/redmine/projects/seaquest-gmc/wiki/Running_GMC_on_Fermigrid) by Kei.
@@ -34,7 +34,10 @@ More about the argument and process is explained in detail on [SeaQuest Monte Ca
 
 For realization and embedding you need to get `seaquest-ktracker` repository and build it.
 ```
-git clone http://p-seaquest-ktracker@cdcvs.fnal.gov/cvs/projects/seaquest-ktracker
+git clone http://cdcvs.fnal.gov/projects/seaquest-ktracker
+```
+
+```
 source /cvmfs/seaquest.opensciencegrid.org/seaquest/software/current/Distribution/setup/setup.sh
 source seaquest-ktracker/setup.sh
 ``` 
@@ -87,6 +90,24 @@ This is the final step where two tracks are combined to form a dimuon. The outpu
 
 ```
  ./submitAll.py -m -j vertex -l list_vertex.txt -c vertex.conf -n 1 -s 20
+
 ```
+Alternatively, we can use the monitoring script (as described below) to submit the vertixing more efficiently.
+## Monitoring Tracking and Vertexing
+```
+./mcMonitor.py -j track -l list_track.txt -c tracking.conf -a mf
+
+```
+- `-a mf` option is for the merging and submitting failed tracking jobs
+- `-a v` option is for the vertexing (not need to create the separate .conf and list files)
+
+```
+./mcMonitor.py -j vertex -l list_track.txt -c tracking.conf -a mf
+
+``` 
+- `-a mf` option is for the merging and submitting failed tracking jobs
+
+For more documentation, follow the instruction as listed in [MCReconHowto.md](https://cdcvs.fnal.gov/redmine/projects/seaquest-ktracker/repository/revisions/scripts/entry/scripts/grid/MCReconHowto.md)
+
 ### More Documentation
 More documentation from Kei: [DocDB-10057](https://seaquest-docdb.fnal.gov/cgi-bin/sso/RetrieveFile?docid=10057&filename=2022-06-28%20.pdf&version=3)
