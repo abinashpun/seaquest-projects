@@ -1,0 +1,5 @@
+- From the `/seaquest/users/apun/e906_projects/mixing_check/e906-root-ana/`, copy the `src` directory and `setup.sh` file.
+- create your mixing systematic study directory and go inside the directory 
+- From the `/seaquest/users/apun/e906_projects/mixing_check/e906-root-ana/kei_test` copy the directories `macros` and `cuts`.
+- * Also create the all the directories (don't copy) as in kei_test
+- 
