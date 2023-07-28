@@ -12,6 +12,8 @@
     1. Embed the tracks correpsonding to MC dimuons ( `RunEmbed.C`): Reads the input generated from the previous step. 
 
         Related function: `AnaSortMixVertex::EmbedMCSignal`
-        - can choose where to embed (i.e. sort_tree or mixed_tree) manually in the code. 
-        - choose the index of the MC tree you want to start embedding from `RunEmbed.C` macro itself
-        - 
+        - can choose where to embed (i.e. sorted_tree or mixed_tree) manually in the code. 
+        - choose the index of the MC tree you want to start embedding from `RunEmbed.C` macro itself. This is because, one gmc root file might have enough gmc dimuons to embed in multiple files with mixed_tree (or sorted_tree). 
+        - choose manually if you want to randomly embed or in fixed interval in the `AnaSortMixVertex::EmbedMCSignal` code itself.
+    1. Mix the embeded file (`RunMix.C`)
+    1. Run the vertexing (`RunVertex.C`): Run vertexing for both embedded (in mixed data) and mixed embedded data.  
